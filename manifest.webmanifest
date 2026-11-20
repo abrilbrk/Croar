@@ -1,0 +1,24 @@
+{
+  "name": "CroAr · Tus raíces, en un solo lugar",
+  "short_name": "CroAr",
+  "description": "Ciudadanía, idioma, becas y la agenda de la colectividad croata en Argentina.",
+  "lang": "es-AR",
+  "start_url": "./#/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f9f6f2",
+  "theme_color": "#f9f6f2",
+  "categories": ["lifestyle", "education", "social"],
+  "icons": [
+    { "src": "assets/app/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/app/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/app/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Oportunidades", "url": "./#/oportunidades" },
+    { "name": "Ciudadanía", "url": "./#/ciudadania" },
+    { "name": "Guardados", "url": "./#/guardados" }
+  ]
+}

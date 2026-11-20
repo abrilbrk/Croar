@@ -508,35 +508,56 @@
   }
 
   function montarApilado(el) {
+    /* Abanico de tarjetas superpuestas: la del centro adelante y las demás escalonadas detrás. */
     const cards = $$('.card', el); const n = cards.length; let cur = 0;
     const dots = $$(`[data-dots="${el.id}"] i`);
-    const pos = (off, w) => {
-      const a = Math.abs(off); const s = a === 0 ? 1 : a === 1 ? 232 / 288 : 176 / 288;
-      const dx = off === 0 ? 0 : Math.sign(off) * (a === 1 ? w * 0.27 : w * 0.38);
-      return `translate(calc(-50% + ${dx}px), -50%) scale(${s})`;
-    };
+    const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ESC = [1, 0.86, 0.78, 0.7];
+    const DX = [0, 0.6, 1.13, 1.6];
+    const offDe = (i) => { let off = ((i - cur) % n + n) % n; if (off > n / 2) off -= n; return off; };
+    const previo = new Map();
     const paint = () => {
-      const w = Math.min(el.clientWidth, 520);
+      const w = cards[0].offsetWidth;
+      /* Con cantidad par sobra una tarjeta a la derecha: corremos el abanico para que quede equilibrado. */
+      const corr = n % 2 === 0 && n > 2 && el.clientWidth >= 700 ? (DX[2] - DX[1]) / 2 : 0;
       cards.forEach((c, i) => {
-        let off = ((i - cur) % n + n) % n; if (off > n / 2) off -= n;
-        c.style.transform = pos(off, w); c.style.zIndex = 10 - Math.abs(off); c.style.opacity = Math.abs(off) > 2 ? 0 : 1;
+        const off = offDe(i); const a = Math.min(Math.abs(off), 3);
+        const t = `translate(calc(-50% + ${(Math.sign(off) * DX[a] - corr) * w}px), -50%) scale(${ESC[a]})`;
+        const antes = previo.get(c);
+        if (antes !== undefined && Math.abs(antes - off) > 1) {
+          /* Al dar la vuelta, la tarjeta no cruza por delante: aparece en su nuevo lugar. */
+          c.style.transition = 'none'; c.style.opacity = 0; c.style.transform = t; void c.offsetWidth; c.style.transition = '';
+        }
+        previo.set(c, off);
+        c.style.transform = t; c.style.zIndex = 10 - a; c.style.opacity = a > 2 ? 0 : 1;
         c.classList.toggle('is-center', off === 0); c.tabIndex = off === 0 ? 0 : -1;
         c.setAttribute('aria-hidden', off !== 0);
       });
       dots.forEach((d, i) => d.classList.toggle('on', i === cur));
     };
     const go = (d) => { cur = (cur + d + n) % n; paint(); };
+    /* Avanza solo y se detiene mientras la persona interactúa. */
+    let timer = null, pausa = false;
+    const auto = () => {
+      clearInterval(timer); if (quieto || pausa) return;
+      timer = setInterval(() => { if (!el.isConnected) return clearInterval(timer); if (!document.hidden) go(1); }, 4000);
+    };
+    const parar = () => { pausa = true; clearInterval(timer); };
+    const seguir = () => { pausa = false; auto(); };
+    el.addEventListener('mouseenter', parar); el.addEventListener('mouseleave', seguir);
+    el.addEventListener('focusin', parar); el.addEventListener('focusout', seguir);
     let x0 = null, moved = false;
-    el.addEventListener('pointerdown', (e) => { x0 = e.clientX; moved = false; });
+    el.addEventListener('pointerdown', (e) => { x0 = e.clientX; moved = false; clearInterval(timer); });
     el.addEventListener('pointermove', (e) => { if (x0 !== null && Math.abs(e.clientX - x0) > 10) moved = true; });
-    el.addEventListener('pointerup', (e) => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); });
+    el.addEventListener('pointerup', (e) => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); auto(); });
     el.addEventListener('click', (e) => {
       const c = e.target.closest('.card'); if (!c) return;
-      if (moved || !c.classList.contains('is-center')) { e.preventDefault(); if (!moved) { const i = +c.dataset.i; let off = ((i - cur) % n + n) % n; if (off > n / 2) off -= n; go(off); } }
+      if (moved || !c.classList.contains('is-center')) { e.preventDefault(); if (!moved) go(offDe(+c.dataset.i)); }
     });
     el.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+    dots.forEach((d, i) => d.addEventListener('click', () => { cur = i; paint(); auto(); }));
     window.addEventListener('resize', paint);
-    paint();
+    paint(); auto();
   }
 
   function montarHistorias(el) {

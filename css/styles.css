@@ -256,8 +256,12 @@ main { flex: 1; padding-top: var(--header-h); padding-bottom: calc(var(--nav-h) 
 .agenda .btn { margin-top: 16px; }
 
 /* ---------- Carrusel apilado (¿Qué buscás hoy?) ---------- */
-.apilado { position: relative; height: 300px; margin: 0 calc(-1 * var(--margin)); overflow: hidden; touch-action: pan-y; user-select: none; }
-.apilado .card { position: absolute; top: 50%; left: 50%; width: 184px; height: 288px; border-radius: var(--r-lg); overflow: hidden; background: #333; color: #fff; transition: transform .45s cubic-bezier(.2,.7,.2,1), opacity .3s, z-index 0s .2s; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.apilado { position: relative; height: 320px; margin: 0 calc(-1 * var(--margin)); overflow: hidden; touch-action: pan-y; user-select: none; }
+.apilado .card { position: absolute; top: 50%; left: 50%; width: 184px; height: 288px; border-radius: var(--r-lg); overflow: hidden; background: #333; color: #fff; transition: transform .7s cubic-bezier(.4,0,.2,1), opacity .5s ease, box-shadow .7s, z-index 0s .25s; box-shadow: 0 4px 12px rgba(0,0,0,.14); }
+.apilado .card.is-center { box-shadow: 0 14px 32px rgba(0,0,0,.28); }
+.apilado .card img { transition: transform 1.2s cubic-bezier(.4,0,.2,1); }
+.apilado .card.is-center:hover img { transform: scale(1.06); }
+@media (prefers-reduced-motion: reduce) { .apilado .card, .apilado .card img { transition-duration: .01s; } }
 .apilado .card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .apilado .card .veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.6)); }
 .apilado .card .txt { position: absolute; left: 16px; right: 16px; bottom: 16px; }
@@ -265,6 +269,7 @@ main { flex: 1; padding-top: var(--header-h); padding-bottom: calc(var(--nav-h) 
 .apilado .card .txt span { font-size: 13px; line-height: 18px; display: block; margin-top: 6px; }
 .apilado .card:not(.is-center) .txt span { display: none; }
 .apilado .card:not(.is-center) .txt b { font-size: 13px; line-height: 16px; }
+[data-dots] i { cursor: pointer; }
 .apilado-dots { display: flex; justify-content: center; gap: 6px; }
 .dots { display: flex; gap: 6px; justify-content: center; }
 .dots i { width: 10px; height: 8px; background: var(--outline-variant); }
@@ -503,7 +508,11 @@ main { flex: 1; padding-top: var(--header-h); padding-bottom: calc(var(--nav-h) 
   .agenda-pop { position: fixed; right: 24px; bottom: 96px; z-index: 40; width: 432px; max-height: calc(100vh - 140px); overflow: auto; background: var(--surface-card); border-radius: var(--r-lg); padding: 24px; box-shadow: 0 12px 32px rgba(0,0,0,.22); }
   .agenda-pop[hidden] { display: none; }
 
-  .apilado { height: 400px; margin: 0; }
+  .apilado { height: 460px; margin: 0; }
+  .apilado .card { width: 300px; height: 400px; }
+  .apilado .card .txt { left: 24px; right: 24px; bottom: 24px; }
+  .apilado .card .txt b { font-size: 32px; line-height: 36px; }
+  .apilado .card:not(.is-center) .txt b { font-size: 20px; line-height: 24px; }
   .selector { grid-template-columns: repeat(4, 1fr); }
   .damero { grid-template-columns: repeat(6, 1fr); grid-auto-rows: 160px; }
   .damero.alto { grid-auto-rows: 160px; }
